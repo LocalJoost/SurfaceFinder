@@ -28,20 +28,16 @@ namespace LocalJoost.Examples
         private UnityEvent<MixedRealityPose> locationFound = new UnityEvent<MixedRealityPose>();
         
         private float delayMoment;
-
         private float initTime;
-        
         private Vector3? foundPosition = null;
-        
         private Vector3 previousPosition = Vector3.positiveInfinity;
-
         private SolverHandler solverHandler;
         private RadialView radialView;
         
         private void Awake()
         {
-            solverHandler = surfaceMagnet.gameObject.GetComponent<SolverHandler>();
-            radialView = surfaceMagnet.gameObject.GetComponent<RadialView>();
+            solverHandler = surfaceMagnet.GetComponent<SolverHandler>();
+            radialView = surfaceMagnet.GetComponent<RadialView>();
             surfaceMagnet.enabled = false;
             radialView.enabled = true;
             initTime = Time.time + 2;
@@ -71,7 +67,8 @@ namespace LocalJoost.Examples
         {
             if (foundPosition != null)
             {
-                locationFound?.Invoke(new MixedRealityPose(foundPosition.Value, solverHandler.gameObject.transform.rotation));
+                locationFound?.Invoke(new MixedRealityPose(
+                    foundPosition.Value, solverHandler.transform.rotation));
                 lookPrompt.SetActive(false);
                 confirmPrompt.SetActive(false);
                 gameObject.SetActive(false);
@@ -84,6 +81,7 @@ namespace LocalJoost.Examples
             {
                 radialView.enabled = false;
                 surfaceMagnet.enabled = true;
+                delayMoment = Time.time + 2;
             }
             
             if (foundPosition == null && Time.time > delayMoment)
@@ -101,7 +99,6 @@ namespace LocalJoost.Examples
                     {
                         solverHandler.enabled = false;
                         lookPrompt.SetActive(false);
-                        confirmPrompt.transform.position = foundPosition.Value;
                         confirmPrompt.SetActive(true);
                         locationFoundSound.Play();
                     }
